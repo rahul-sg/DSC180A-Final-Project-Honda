@@ -1,4 +1,4 @@
-# eval_baseline.py
+eval_baseline.py
 # LLM-as-judge baseline for lecture summarization — robust, reproducible, and easy to extend.
 
 from __future__ import annotations
