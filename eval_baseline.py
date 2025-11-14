@@ -1,7 +1,13 @@
-eval_baseline.py
-# LLM-as-judge baseline for lecture summarization — robust, reproducible, and easy to extend.
-
 from __future__ import annotations
+# eval_baseline.py
+# LLM-as-judge baseline for lecture summarization — robust, reproducible, and easy to extend.
+from dotenv import load_dotenv
+import os
+from openai import OpenAI
+
+load_dotenv()
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 from typing import List, Dict, Any, Tuple
 from dataclasses import dataclass
 import json, re, random
@@ -33,18 +39,18 @@ def estimate_tokens(text: str) -> int:
 
 def chunk_slides_by_tokens(
     slides: List[Dict],
-    max_tokens: int = 1500,
+    max_completion_tokens: int = 1500,
     text_key: str = "content"
 ) -> List[List[Dict]]:
     """
-    Chunk slides so each chunk stays under ~max_tokens (approx).
+    Chunk slides so each chunk stays under ~max_completion_tokens (approx).
     Safer for LLM context windows than chunking by count.
     """
     chunks: List[List[Dict]] = []
     current, cur_tok = [], 0
     for s in slides:
         t = estimate_tokens(str(s.get(text_key, "")))
-        if current and cur_tok + t > max_tokens:
+        if current and cur_tok + t > max_completion_tokens:
             chunks.append(current)
             current, cur_tok = [], 0
         current.append(s)
@@ -54,12 +60,12 @@ def chunk_slides_by_tokens(
     return chunks
 
 
-def _slides_to_str(slides: List[Dict], max_chunks: int = 3, max_tokens: int = 1500) -> str:
+def _slides_to_str(slides: List[Dict], max_chunks: int = 3, max_completion_tokens: int = 1500) -> str:
     """
     Render slides into a compact text block for the judge, with token-safe chunking.
     Caps the number of chunks to limit total context size.
     """
-    chunks = chunk_slides_by_tokens(slides, max_tokens=max_tokens)
+    chunks = chunk_slides_by_tokens(slides, max_completion_tokens=max_completion_tokens)
     chunks = chunks[:max_chunks]
     out = []
     for ci, ch in enumerate(chunks, 1):
@@ -206,27 +212,36 @@ class LLMConfig:
     provider: str = "openai"         # e.g., "openai", "anthropic", "local"
     model: str = "gpt-4o-mini"       # change to your model
     temperature: float = 0.2
-    max_tokens: int = 512
+    max_completion_tokens: int = 512
     seed: int | None = None          # use if your provider supports it
 
 
+from dotenv import load_dotenv
+import os
+from openai import OpenAI
+
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 def call_llm(system: str, user: str, cfg: LLMConfig) -> str:
     """
-    Single chokepoint for model calls. Replace internals with your SDK.
-    Return raw text (ideally JSON due to our prompts).
+    gpt-5-nano compatible call:
+    - no temperature
+    - no seed
+    - no max_completion_tokens
     """
-    # Example (pseudo) OpenAI usage:
-    # from openai import OpenAI
-    # client = OpenAI()
-    # resp = client.chat.completions.create(
-    #   model=cfg.model,
-    #   temperature=cfg.temperature,
-    #   max_tokens=cfg.max_tokens,
-    #   seed=cfg.seed,
-    #   messages=[{"role":"system","content":system},{"role":"user","content":user}],
-    # )
-    # return resp.choices[0].message.content
-    return '{"note":"Replace call_llm() internals with your provider!"}'
+    model_name = cfg.model if cfg.model else "gpt-5-nano"
+
+    response = client.responses.create(
+        model=model_name,
+        input=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+    )
+
+    return response.output_text
+
 
 
 # =========================================================
@@ -303,7 +318,7 @@ def judge_scores(slides: List[Dict], summary: str, cfg: LLMConfig) -> Dict[str, 
     Reference-free judge: compare summary directly against the slides on a rubric.
     Returns integer scores and qualitative strengths/issues.
     """
-    slides_str = _slides_to_str(slides, max_chunks=3, max_tokens=1500)
+    slides_str = _slides_to_str(slides, max_chunks=3, max_completion_tokens=1500)
     user_msg = f"[Slides]\n{slides_str}\n\n[Summary]\n{summary}\n\nReturn ONLY JSON."
     raw = call_llm(_RUBRIC_PROMPT, user_msg, cfg)
     data = _force_json(raw)
@@ -339,7 +354,7 @@ def pairwise_judge(slides: List[Dict], A: str, B: str, cfg: LLMConfig) -> Dict[s
     """
     Head-to-head judge: choose the better of two summaries for the same lecture.
     """
-    slides_str = _slides_to_str(slides, max_chunks=3, max_tokens=1500)
+    slides_str = _slides_to_str(slides, max_chunks=3, max_completion_tokens=1500)
     user_msg = f"[Slides]\n{slides_str}\n\n[Summary A]\n{A}\n\n[Summary B]\n{B}\n\nReturn ONLY JSON."
     raw = call_llm(_PAIRWISE_PROMPT, user_msg, cfg)
     data = _force_json(raw)
@@ -547,7 +562,13 @@ if __name__ == "__main__":
     model_sum = "Update parameters using the negative gradient. High LR diverges. Stop by validation or gradient."
 
     # Configure your model (wire call_llm() first to actually run judges)
-    cfg = LLMConfig(provider="openai", model="gpt-4o-mini", temperature=0.2, max_tokens=512, seed=7)
+    cfg = LLMConfig(
+    provider="openai",
+    model="gpt-5-nano",  # <- updated
+    temperature=1.0,     # ignored for gpt-5-nano
+    max_completion_tokens=0,  # ignored
+    seed=None             # ignored
+    )
 
     # Deterministic signals run without an LLM:
     print("Signals (no LLM needed):", simple_signals(slides, model_sum, target_words=80))

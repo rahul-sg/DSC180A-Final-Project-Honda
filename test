@@ -1,0 +1,11 @@
+from eval_baseline import call_llm, LLMConfig
+
+cfg = LLMConfig(model="gpt-5-nano")
+
+response = call_llm(
+    system="You are a helpful assistant.",
+    user="Tell me a joke about computers.",
+    cfg=cfg
+)
+
+print(response)
