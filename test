@@ -1,11 +1,178 @@
 from eval_baseline import call_llm, LLMConfig
+import PyPDF2
+#pip installPyPDF2
+import docx
+#pip install python-docx
+from pathlib import Path
+from openai import OpenAI
 
-cfg = LLMConfig(model="gpt-5-nano")
+# Initialize your client
+client = OpenAI()
 
-response = call_llm(
-    system="You are a helpful assistant.",
-    user="Tell me a joke about computers.",
-    cfg=cfg
-)
+# -------------------------------------------------------
+# LLM CONFIG STRUCTURE
+# -------------------------------------------------------
 
-print(response)
+class LLMConfig:
+    def __init__(self, model: str):
+        self.model = model
+
+# Your configurations
+GPT_MINI = LLMConfig("gpt-5-mini")
+GPT_NANO = LLMConfig("gpt-5-nano")
+
+
+# -------------------------------------------------------
+# 1. Extract Text From File
+# -------------------------------------------------------
+
+def extract_text_from_pdf(path: Path) -> str:
+    text = ""
+    with open(path, "rb") as f:
+        reader = PyPDF2.PdfReader(f)
+        for page in reader.pages:
+            t = page.extract_text()
+            if t:
+                text += t + "\n"
+    return text
+
+
+def extract_text_from_docx(path: Path) -> str:
+    doc = docx.Document(path)
+    return "\n".join(p.text for p in doc.paragraphs)
+
+
+def extract_text(path: str) -> str:
+    path = Path(path)
+    if not path.exists():
+        raise FileNotFoundError(f"File does not exist: {path}")
+
+    if path.suffix.lower() == ".pdf":
+        return extract_text_from_pdf(path)
+
+    if path.suffix.lower() == ".docx":
+        return extract_text_from_docx(path)
+
+    return path.read_text(encoding="utf-8")
+
+
+# -------------------------------------------------------
+# 2. YOUR LLM FUNCTION (plugged in exactly)
+# -------------------------------------------------------
+
+def call_llm(system: str, user: str, cfg: LLMConfig) -> str:
+    """
+    gpt-5-nano compatible call:
+    - no temperature
+    - no seed
+    - no max_completion_tokens
+    """
+    model_name = cfg.model if cfg.model else "gpt-5-nano"
+
+    response = client.responses.create(
+        model=model_name,
+        input=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+    )
+
+    return response.output_text
+
+
+# -------------------------------------------------------
+# 3. Summarizer Function
+# -------------------------------------------------------
+
+def summarize_lecture(text: str) -> str:
+    return call_llm(
+        system="Summarize the following lecture clearly, accurately, and concisely.",
+        user=text,
+        cfg=GPT_MINI  # summarizer model
+    )
+
+
+# -------------------------------------------------------
+# 4. Judge Function
+# -------------------------------------------------------
+
+def judge_summary(lecture_text: str, summary_text: str) -> str:
+    prompt = f"""
+You are a grading assistant. Evaluate the student's summary.
+
+LECTURE TEXT:
+{lecture_text}
+
+STUDENT SUMMARY:
+{summary_text}
+
+Return the evaluation in the format:
+
+- **Accuracy (0–10):**
+- **Coverage (what important ideas were missing):**
+- **Hallucinations (anything invented):**
+- **Specific improvements:**
+"""
+    return call_llm(
+        system="Evaluate the quality of the lecture summary.",
+        user=prompt,
+        cfg=GPT_NANO   # judge model
+    )
+
+
+# -------------------------------------------------------
+# 5. MAIN PIPELINE
+# -------------------------------------------------------
+
+def run_pipeline():
+    LECTURE_FILE = "testfile.pdf"
+
+    print("Extracting text...")
+    lecture_text = extract_text(LECTURE_FILE)
+
+    # ---- ITERATION 1: Initial summary ----
+    print("\nInitial summarization...")
+    summary = summarize_lecture(lecture_text)
+
+    for i in range(1, 4):  # 3 iterations
+        print(f"\n--- Iteration {i}: Judging summary ---")
+        evaluation = judge_summary(lecture_text, summary)
+        print(evaluation)
+
+        print(f"\n--- Iteration {i}: Revising summary ---")
+        summary = revise_summary(summary, evaluation)
+        print(summary)
+
+    # Final output
+    print("\n================ FINAL SUMMARY ================\n")
+    print(summary)
+
+    print("\n================ FINAL JUDGEMENT ================\n")
+    final_eval = judge_summary(lecture_text, summary)
+    print(final_eval)
+
+def revise_summary(summary: str, judge_feedback: str) -> str:
+    prompt = f"""
+Revise the following summary based on the judge's feedback.
+
+CURRENT SUMMARY:
+{summary}
+
+JUDGE FEEDBACK:
+{judge_feedback}
+
+Please return an improved summary that:
+- fixes all issues mentioned
+- improves accuracy and coverage
+- removes hallucinations
+- remains concise and clear
+"""
+    return call_llm(
+        system="Revise the student's lecture summary.",
+        user=prompt,
+        cfg=GPT_MINI
+    )
+
+
+if __name__ == "__main__":
+    run_pipeline()

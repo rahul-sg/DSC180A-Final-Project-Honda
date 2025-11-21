@@ -1,5 +1,6 @@
 from __future__ import annotations
 # eval_baseline.py
+#need to pip install PyPDF2 python-docx
 # LLM-as-judge baseline for lecture summarization — robust, reproducible, and easy to extend.
 from dotenv import load_dotenv
 import os
