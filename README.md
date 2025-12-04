@@ -35,21 +35,21 @@ DSC180A-Final-Project/
 
 ## 🛠 Environment Setup
 
-### Start-Up Scripts:
+### Start-Up Scripts
 
-#### If you have Mac/Linux (bash):
+#### If you have Mac/Linux (bash)
 
 ```bash
 chmod +x startup.sh
 source startup.sh
 ```
 
-#### If you have Windows (PowerShell):
+#### If you have Windows (PowerShell)
 ```powershell
 powershell -ExecutionPolicy Bypass -File startup.ps1
 ```
 
-### Running the Start-Up Script does the following (you don't have to do this if you ran the startup script):
+### Running the Start-Up Script does the following (you don't have to do this if you ran the startup script)
 
 #### Create environment
 ```bash
@@ -63,7 +63,7 @@ Create `.env`:
 OPENAI_API_KEY=your_key_here
 ```
 
-### To deactivate conda environment at anytime, run:
+### To deactivate conda environment at anytime, run
 ```bash
 conda deactivate
 ```
