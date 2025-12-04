@@ -37,27 +37,27 @@ DSC180A-Final-Project/
 
 ### Start-Up Scripts
 
-#### If you have Mac/Linux (bash)
+#### If you have Mac/Linux (bash):
 
 ```bash
 chmod +x startup.sh
 source startup.sh
 ```
 
-#### If you have Windows (PowerShell)
+#### If you have Windows (PowerShell):
 ```powershell
 powershell -ExecutionPolicy Bypass -File startup.ps1
 ```
 
 ### Running the Start-Up Script does the following (you don't have to do this if you ran the startup script)
 
-#### Create environment
+#### Create environment:
 ```bash
 conda env create -f environment.yml
 conda activate dsc180a-eval
 ```
 
-#### Environment variables
+#### Environment variables:
 Create `.env`:
 ```
 OPENAI_API_KEY=your_key_here
@@ -69,7 +69,7 @@ conda deactivate
 ```
 
 ## ▶️ Running Evaluation
-Evaluate a lecture:
+### Evaluate a lecture
 ```bash
 python -m src.experiments.run_eval lecture1 yes
 ```
@@ -97,16 +97,16 @@ data/slides/lecture1/
 
 ## 📊 Dashboards
 
-#### NOTE: RUN THESE AFTER YOU RUN THE INITIAL MODEL SO THE FILES ARE GENERATED
+**NOTE:** RUN THESE AFTER YOU RUN THE INITIAL EVALUATION SO THE DATA IS GENERATED
 
 ### Static Dashboard
-Run:
+#### Run:
 ```bash
 python -m src.visualization.dashboard lecture1
 ```
 
 ### Interactive Streamlit Dashboard
-Run:
+#### Run:
 ```bash
 streamlit run src/visualization/interactive_dashboard.py
 ```
@@ -174,7 +174,7 @@ lecture_title
 
 ## 🧪 Example Test Data
 
-We have provided some basic test results within the following domains:
+### We have provided some basic test results within the following domains:
 - `data/summaries/refined_iterations/lecture1/` - UCSD MGT 45 (Financial & Managerial Accounting) [Dr. Andreya Pérez Silva] - Week 1 Slides
 - `data/summaries/refined_iterations/lecture2/` - UCSD MGT 45 (Financial & Managerial Accounting) [Dr. Andreya Pérez Silva] - Week 2 Slides
 - `data/summaries/refined_iterations/lecture2/` - UCSD LATI 10 (Reading North by South: Latin American Studies and the US Liberation Movements) [Dr. Amy Kennemore] - Week 3 Slides
@@ -183,7 +183,7 @@ We have provided some basic test results within the following domains:
 - `data/summaries/refined_iterations/lecture6/` - UCSD 
 - `data/summaries/refined_iterations/lecture7/` - UCSD
 
-The LLM-Generated initial summaries for each respective test-set are here:
+#### The LLM-Generated initial summaries for each respective test-set are stored here:
 ```
 data/slides/lecture1.txt
 data/slides/lecture2.txt
@@ -193,7 +193,7 @@ data/slides/lecture5.txt
 data/slides/lecture6.txt
 data/slides/lecture7.txt
 ```
-And the Human-Written summaries for each respective test-set are here:
+#### And the Human-Written summaries for each respective test-set are stored here:
 ```
 data/references/lecture1_reference.txt
 data/references/lecture2_reference.txt
@@ -210,6 +210,14 @@ data/references/lecture7_reference.txt
 2. Write a 250-300 word human summarization for your lecture slides and save it under the `data/references/` folder with the following naming scheme: `lectureN_reference.txt` where N is the next available number in the folder (you would start with `lecture8_reference.txt`)
 3. Navigate back to the root folder `DSC180A-Final-Project-Honda` and run the program
 
+## 👥 Authors
+#### Rahul Sengupta
+#### Akshay Medidi
+#### Zeyu (Edward) Qi
+#### Zachary Thomason 
+## 👥 Mentors
+#### Rajeev Chhajer
+#### Ryan Lingo
 
 ## 📜 License
 
@@ -218,8 +226,3 @@ This project was developed for the UC San Diego DSC180A Capstone for Fall 2025.
 Evaluation Strategies for Next-Generation AI Systems
 
 Industry Partner - **Honda Research Labs**
-
-## 👥 Authors
-Rahul Sengupta | Akshay Medidi | Zeyu (Edward) Qi | Zachary Thomason 
-## 👥 Mentors
-Rajeev Chhajer | Ryan Lingo
