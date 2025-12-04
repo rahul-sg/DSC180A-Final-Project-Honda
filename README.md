@@ -1,172 +1,200 @@
-# 📘 **DSC180A – Lecture Summarization Evaluation System**
-### *A reproducible LLM-as-Judge evaluation framework with iterative refinement*
+# 📘 DSC180A – Evaluation Strategies for Next-Generation AI Systems
 
-This repository implements a rigorous and extensible evaluation pipeline for lecture summarization. The system combines **LLM-based rubric scoring**, **reference-aware evaluation**, and **deterministic similarity metrics** to assess the quality and faithfulness of generated summaries. It also includes an **iterative refinement loop**, allowing summaries to be improved automatically using LLM feedback.
+This repository implements a complete pipeline for generating, refining, and evaluating large‑language‑model (LLM) summarizations of university lecture materials. The system uses as an example: **lecture PDFs**. 
 
-This project supports research on summarization quality, model comparison, and reliability analysis in academic and industrial settings.
+This system processes the slides and produces an initial summary (S₀), iteratively refines the summary using rubric‑based improvement steps, and evaluates the final output using both deterministic metrics and LLM‑based judges. An interactive Streamlit dashboard is included for exploration of results.
 
----
-
-## 🚀 **Core Capabilities**
-
-### **1. Reference-Free Evaluation (Rubric-Based)**
-A structured 5-dimension rubric evaluates:
-- Coverage  
-- Faithfulness to slides  
-- Organization  
-- Pedagogical clarity  
-- Writing quality  
-
-### **2. Reference-Aware Evaluation**
-Compares model output with a human-written reference summary using:
-- Agreement scoring  
-- Detection of missing key points  
-- Detection of added inaccuracies  
-
-### **3. Deterministic Faithfulness Signals**
-Non-LLM, fully reproducible metrics:
-- Length deviation  
-- Section keyword coverage  
-- Glossary recall  
-- Hallucination rate via TF-IDF retrieval similarity  
-
-### **4. Iterative Summary Refinement**
-An automated refinement procedure:
+## 📁 Project Structure
 
 ```
-S₀ → Judge → S₁ → Judge → S₂ → Judge → S₃
+DSC180A-Final-Project/
+├── data/
+│   ├── references/
+│   ├── slides/
+│   └── summaries/
+│       ├── model_s0/
+│           └── lectureX.txt
+│       └── refined_iterations/
+│           └── lectureX/
+│               ├── iter_0.txt … iter_n.txt
+│               ├── final.txt
+│               └── result.json
+│
+├── src/
+│   ├── evaluation/
+│   ├── experiments/
+│   ├── models/
+│   ├── utils/
+│   └── visualization/
+│
+├── environment.yml
+├── requirements.txt
+├── eval_baseline.py
+└── README.md
 ```
 
-Each iteration rewrites the summary using judge feedback to increase faithfulness and clarity.
+## 🛠 Environment Setup
 
-### **5. Ensemble Judging**
-Multiple LLM calls with different seeds reduce variance and produce more stable scores.
-
-### **6. Pairwise Comparison**
-Allows head-to-head evaluation of alternative summaries using an LLM judge.
-
-### **7. Pluggable LLM Backend**
-All API access is centralized, enabling easy replacement with:
-- OpenAI models  
-- Anthropic Claude  
-- Azure OpenAI  
-- Local inference backends  
-
----
-
-## 📂 **Repository Structure**
-
-```
-.
-├── eval_baseline.py        # Main evaluation, refinement, and scoring system
-├── environment.yml         # Conda environment file
-├── .env.example            # Template for environment variables
-├── .gitignore              # Excludes secrets, venvs, and caches
-└── README.md               # Project documentation
-```
-
----
-
-## ⚙️ **Setup and Installation**
-
-### **1. Create the Conda Environment**
-
+### Create environment
 ```bash
 conda env create -f environment.yml
 conda activate dsc180a-eval
 ```
 
-### **2. Configure Environment Variables**
+### Environment variables
+Create `.env`:
+```
+OPENAI_API_KEY=your_key_here
+```
 
-Copy the example:
-
+## ▶️ Running Evaluation
+Evaluate a lecture:
 ```bash
-cp .env.example .env
+python src/experiments/run_eval.py lecture1
 ```
 
-Insert your key in `.env`:
+This generates:
+```
+data/summaries/refined_iterations/lecture1/
+    iter_0.txt
+    iter_1.txt
+    iter_2.txt
+    iter_3.txt
+    final.txt
+    result.json
+```
+And: 
 
 ```
-OPENAI_API_KEY=sk-...
+data/slides/lecture1/
+    lecture1.txt
 ```
 
----
+## 📊 Dashboards
 
-## ▶️ **Running the Evaluation Pipeline**
+#### NOTE: RUN THESE AFTER YOU RUN THE INITIAL MODEL SO THE FILES ARE GENERATED
 
+### Static Dashboard
+Run:
 ```bash
-python eval_baseline.py
+python -m src.visualization.dashboard lecture1
 ```
 
-This will:
-
-1. Load example slides and summary  
-2. Compute deterministic signals  
-3. Run rubric-based LLM scoring  
-4. Run reference-aware agreement scoring  
-5. Perform iterative refinement (if enabled)  
-6. Output the final summary and scalar evaluation score  
-
----
-
-## 🧪 **Evaluating Your Own Summaries**
-
-Replace the example definitions in `eval_baseline.py`:
-
-```python
-slides = [...]
-human_ref = "..."
-model_sum = "..."
+### Interactive Streamlit Dashboard
+Run:
+```bash
+streamlit run src/visualization/interactive_dashboard.py
 ```
 
-or load from files:
+Includes:
+- Summary length trends  
+- Deterministic signal bar charts  
+- Rubric radar chart  
+- Agreement score  
+- Semantic drift visualization  
+- Heatmap of rubric vs. agreement  
+- Full text viewer for iteration outputs  
 
-```python
-import json
-slides = json.load(open("slides.json"))
-model_sum = open("summary.txt").read()
+## 🚀 Workflow Overview
+
+### 1. Preprocessing
+Lecture PDFs are converted into text and segmented using utilities in `src/utils/`.
+
+### 2. Initial Summarization (S₀)
+`models/summarizer.py` generates a baseline summary stored under  
+`data/summaries/model_s0/`.
+
+### 3. Iterative Refinement
+`models/refinement.py` improves S₀ over multiple iterations. Outputs are saved as  
+`iter_0.txt`, `iter_1.txt`, … and `final.txt`.
+
+### 4. Evaluation
+Evaluation combines:
+
+#### Deterministic Metrics (`signals.py`)
+- **Length Error**
+- **Section Coverage %**
+- **Glossary Recall**
+- **Suspected Hallucination Rate**
+
+#### Rubric‑Based LLM Evaluation (`judge.py`)
+Scores (1–5):
+- Coverage  
+- Faithfulness  
+- Organization  
+- Clarity  
+- Style  
+
+Also includes:
+- Two strengths  
+- Two issues  
+- Faithfulness evidence  
+
+#### Agreement Judge
+Compares final summary to reference:
+- agreement_1to5  
+- missing_key_points  
+- added_inaccuracies  
+
+### Example `result.json`
+Contains:
+```
+refined_summary
+signals → { length_error, section_coverage_pct, glossary_recall, ... }
+rubric → { coverage, faithfulness, organization, clarity, style, ... }
+agreement → { agreement_1to5, missing_key_points, added_inaccuracies }
+final_score_0to1
+lecture_title
 ```
 
----
+## 🧪 Example Test Data
 
-## 🔄 **Controlling Iterative Refinement**
+We have provided some basic test results within the following domains:
+- `data/summaries/refined_iterations/lecture1/` - UCSD MGT 45 (Financial & Managerial Accounting) [Dr. Andreya Pérez Silva] - Week 1 Slides
+- `data/summaries/refined_iterations/lecture2/` - UCSD MGT 45 (Financial & Managerial Accounting) [Dr. Andreya Pérez Silva] - Week 2 Slides
+- `data/summaries/refined_iterations/lecture2/` - UCSD LATI 10 (Reading North by South: Latin American Studies and the US Liberation Movements) [Dr. Amy Kennemore] - Week 3 Slides
+- `data/summaries/refined_iterations/lecture4/` - UCSD ANTH 2 (Human Origins) [Maria Carolina Marchetto, PhD] - Week 2 Slides
+- `data/summaries/refined_iterations/lecture5/` - UCSD EDS/SOCI 117 (Language, Culture, and Education) [Gabrielle Jones, Ph.D.] - Week 2 Wednesday Slides
+- `data/summaries/refined_iterations/lecture6/` - UCSD 
+- `data/summaries/refined_iterations/lecture7/` - UCSD
 
-```python
-res = evaluate_one_summary(
-    slides,
-    model_sum,
-    human_ref,
-    cfg,
-    refine_iters=3
-)
+The LLM-Generated initial summaries for each respective test-set are here:
+```
+data/slides/lecture1.txt
+data/slides/lecture2.txt
+data/slides/lecture3.txt
+data/slides/lecture4.txt
+data/slides/lecture5.txt
+data/slides/lecture6.txt
+data/slides/lecture7.txt
+```
+And the Human-Written summaries for each respective test-set are here:
+```
+data/references/lecture1_reference.txt
+data/references/lecture2_reference.txt
+data/references/lecture3_reference.txt
+data/references/lecture4_reference.txt
+data/references/lecture5_reference.txt
+data/references/lecture6_reference.txt
+data/references/lecture7_reference.txt
 ```
 
-Set `refine_iters=0` to disable refinement.
+## 💽 To Add Your Own Data
 
----
+1. Add a PDF file of your lecture slide under the `data/slides/` folder with the following naming scheme: `lectureN.pdf` where N is the next available number in the folder (you would start with `lecture8.pdf`)
+2. Write a 250-300 word human summarization for your lecture slides and save it under the `data/references/` folder with the following naming scheme: `lectureN_reference.txt` where N is the next available number in the folder (you would start with `lecture8_reference.txt`)
+3. Navigate back to the root folder `DSC180A-Final-Project-Honda` and run the program
 
-## 📊 **Output Format**
 
-```json
-{
-  "refined_summary": "...",
-  "signals": {...},
-  "rubric": {...},
-  "agreement": {...},
-  "final_score_0to1": 0.87
-}
-```
+## 📜 License
 
----
+This project was developed for the UC San Diego DSC180A Capstone for Fall 2025.
 
-## 🔒 **Security Considerations**
+Evaluation Strategies for Next-Generation AI Systems
 
-- `.env` must not be committed  
-- `.gitignore` excludes secrets, cache directories, and virtual environments  
+Industry Partner - **Honda Research Labs**
 
----
-
-## 📜 **License**
-
-This project was developed for the UC San Diego DSC180A Capstone.  
-It may be adapted for educational or research purposes with appropriate attribution.
+## 👥 Authors
+Rahul Sengupta | Akshay Medidi | Zeyu (Edward) Qi | Zachary Thomason 
+## 👥 Mentors
+Rajeev Chhajer | Ryan Lingo

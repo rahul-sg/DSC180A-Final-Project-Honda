@@ -1,0 +1,36 @@
+{
+  "refined_summary": "This week\u2019s lecture extended the foundation of financial accounting by linking the financial statements and introducing double\u2011entry recording. It opened with brief updates, then emphasized that accounting interprets complex economic activity and communicates it through structured financial statements.  \n\nThe four fundamental reports\u2014the balance sheet, income statement, statement of stockholders\u2019 equity, and statement of cash flows\u2014work together to describe a firm\u2019s position and performance. The balance sheet captures assets, liabilities, and equity at a specific date, while the other statements summarize changes over the fiscal period. Those changes explain how conditions move from one balance\u2011sheet date to the next. Revenues raise and expenses lower retained earnings; therefore, net income increases stockholders\u2019 equity, and a net loss decreases it.  \n\nThe lecture then expanded the accounting equation\u2014Assets\u202f=\u202fLiabilities\u202f+\u202fShareholders\u2019\u202fEquity\u2014by showing equity as contributed capital plus retained earnings. Retained earnings evolve from beginning balance + net income \u2013 dividends, or more specifically + revenues \u2013 expenses \u2013 dividends. This equation also frames account updates: beginning balance + increases \u2013 decreases = ending balance, ensuring each period\u2019s ending balances become the next period\u2019s beginning balances.  \n\nThe core section explained double\u2011entry mechanics. Every transaction has a dual effect recorded as equal debits and credits, keeping A\u202f=\u202fL\u202f+\u202fSE in balance. Debits increase assets and decrease liabilities or equity; credits have the opposite effect, and no negative numbers are used. The lecture illustrated these rules through a sequence of transactions\u2014borrowing from a bank, buying equipment and inventory, paying suppliers, purchasing prepaid insurance, and issuing stock\u2014showing how each affects accounts and maintains equality.  \n\nVisual tools reinforced the system. The \u201csuper\u202fT\u2011account\u201d organized all major accounts (assets, liabilities, contributed capital, retained earnings, revenues, expenses, and dividends) and showed their normal debit or credit sides. The mnemonic **DEALOR** summarized these patterns: Dividends, Expenses, and Assets carry debit balances, while Liabilities, Owner\u2019s Equity, and Revenues carry credit balances.  \n\nFinally, the lecture outlined the accounting process: (1) analyze each economic event, (2) record the debits and credits as journal entries, and (3) post them to T\u2011accounts to determine ending balances. Ensuring that total debits equal total credits both preserves the accounting equation and forms the basis for accurate financial statement preparation across periods.",
+  "signals": {
+    "length_error": 0.22,
+    "section_coverage_pct": 0.8596491228070176,
+    "glossary_recall": 0.5952380952380952,
+    "suspected_hallucination_rate": 0.16666666666666666
+  },
+  "rubric": {
+    "coverage": 5,
+    "faithfulness": 5,
+    "organization": 5,
+    "clarity": 5,
+    "style": 4,
+    "overall_1to10": 9,
+    "two_strengths": [
+      "The summary accurately explains how the financial statements link together and how net income affects stockholders\u2019 equity.",
+      "It clearly captures the rules and logic of double-entry accounting, including debit/credit mechanics and transaction effects."
+    ],
+    "two_issues": [
+      "The summary could highlight specific slide phrases such as 'Every transaction must have at least one debit and one credit' more explicitly to reinforce evidence of faithfulness.",
+      "Some minor stylistic repetition could be reduced to make the flow more concise."
+    ],
+    "faithfulness_evidence": [
+      "Slide 19: 'Debits must equal credits for all transactions.'",
+      "Slide 11: 'Net Income = \u2191SE; Net Loss = \u2193SE'"
+    ]
+  },
+  "agreement": {
+    "agreement_1to5": 5,
+    "missing_key_points": [],
+    "added_inaccuracies": []
+  },
+  "final_score_0to1": 0.9833333333333334,
+  "lecture_title": "lecture2"
+}

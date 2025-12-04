@@ -1,41 +1,80 @@
-# ---- ENVIRONMENT VARIABLES ----
-.env
-*.env
-
-# ---- PYTHON ----
+# --------------------------------------
+# Python / Virtual Environments
+# --------------------------------------
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.egg-info/
-*.egg
+*.pdb
+*.pyd
+*.so
 
-# ---- VIRTUAL ENVIRONMENTS ----
-venv/
+# Virtual environment folders
 .venv/
+venv/
 env/
+ENV/
+*.env
+*.venv
+
+# Conda environment artifacts
+conda-meta/
 .dsc180a-eval/
-dsc180a-eval/
-*/dsc180a-eval/
+*.conda
 
-# ---- JUPYTER ----
-.ipynb_checkpoints/
-
-# ---- OS FILES ----
+# --------------------------------------
+# OS-specific
+# --------------------------------------
 .DS_Store
 Thumbs.db
 
-# ---- EDITOR ----
-.vscode/
-.idea/
-
-# ---- BUILD / CACHE ----
-build/
-dist/
-.cache/
-.pytest_cache/
-
-# ---- PROJECT GENERATED FILES ----
+# --------------------------------------
+# Logs & runtime output
+# --------------------------------------
 logs/
-outputs/
+*.log
+
+# LLM iteration outputs
+iteration_logs/
+iter_*.txt
+
+# Temporary evaluation outputs
+tmp/
+cache/
 results/
+outputs/
+
+# --------------------------------------
+# Project-specific
+# --------------------------------------
+# Auto-generated slide JSONs
+data/slides/*.json
+
+# Keep PDFs, ignore generated JSON
+!data/slides/*.pdf
+
+# Ignore experiment outputs
+experiments/*.json
+experiments/*.txt
+experiments/*.csv
+
+# --------------------------------------
+# Python packaging
+# --------------------------------------
+dist/
+build/
+*.egg-info/
+
+# --------------------------------------
+# Jupyter
+# --------------------------------------
+.ipynb_checkpoints/
+
+# --------------------------------------
+# Environment and keys
+# --------------------------------------
+.env
+.env.*
+credentials.json
+*.key
+*.token

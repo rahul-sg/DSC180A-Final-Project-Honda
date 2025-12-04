@@ -1,0 +1,9 @@
+Week 2 focused on double-entry accounting and the mechanics of recording transactions. The lecture began by reinforcing that every economic event has two sides—a give and a take—so accounting requires capturing both effects to maintain the fundamental equation Assets = Liabilities + Stockholders’ Equity. Because of this dual impact, every transaction must include at least one debit and one credit, and total debits must always equal total credits.
+
+Students were introduced to T-accounts, which display debits on the left and credits on the right. A key rule is that debits increase assets and decrease liabilities and equity, while credits decrease assets and increase liabilities and equity. This opposing structure ensures the accounting equation stays balanced. The lecture walked through multiple examples, such as taking out a bank loan, purchasing equipment, buying inventory on account, paying suppliers, and recording prepaid insurance. Each example illustrated how to determine which accounts go up or down and whether they require a debit or credit.
+
+The class then expanded the accounting equation to show how contributed capital, retained earnings, revenues, expenses, and dividends all fit together. Revenues increase equity through net income, while expenses and dividends decrease it. This leads naturally into recognizing why proper classification and recording matter for later periods.
+
+A major part of the lecture involved computing ending balances through T-accounts and showing how those balances become the beginning balances for the next period. Students also learned how transactions are recorded formally as journal entries, with debits listed first and credits indented.
+
+Overall, Week 2 established the mechanical skills underlying all future accounting work: understanding debits and credits, analyzing transactions, maintaining balance, and preparing accurate records that flow into the financial statements.

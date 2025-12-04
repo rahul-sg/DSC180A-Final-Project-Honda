@@ -4,8 +4,13 @@ channels:
 dependencies:
   - python=3.10
   - numpy
+  - scipy
   - scikit-learn
+  - matplotlib
   - pip
   - pip:
-      - openai
+      - openai>=1.3.0
       - python-dotenv
+      - streamlit
+      - plotly
+      - pymupdf
