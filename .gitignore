@@ -1,0 +1,41 @@
+# ---- ENVIRONMENT VARIABLES ----
+.env
+*.env
+
+# ---- PYTHON ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+
+# ---- VIRTUAL ENVIRONMENTS ----
+venv/
+.venv/
+env/
+.dsc180a-eval/
+dsc180a-eval/
+*/dsc180a-eval/
+
+# ---- JUPYTER ----
+.ipynb_checkpoints/
+
+# ---- OS FILES ----
+.DS_Store
+Thumbs.db
+
+# ---- EDITOR ----
+.vscode/
+.idea/
+
+# ---- BUILD / CACHE ----
+build/
+dist/
+.cache/
+.pytest_cache/
+
+# ---- PROJECT GENERATED FILES ----
+logs/
+outputs/
+results/

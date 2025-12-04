@@ -1,4 +1,3 @@
-eval_baseline.py
 # LLM-as-judge baseline for lecture summarization — robust, reproducible, and easy to extend.
 
 from __future__ import annotations
@@ -6,6 +5,14 @@ from typing import List, Dict, Any, Tuple
 from dataclasses import dataclass
 import json, re, random
 import numpy as np
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
+
+# Load .env from the same directory as this script
+env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
+load_dotenv(env_path)
+
 
 # Lightweight NLP (no web). Install scikit-learn for TF-IDF and cosine sim.
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -211,23 +218,22 @@ class LLMConfig:
 
 
 def call_llm(system: str, user: str, cfg: LLMConfig) -> str:
-    """
-    Single chokepoint for model calls. Replace internals with your SDK.
-    Return raw text (ideally JSON due to our prompts).
-    """
-    # Example (pseudo) OpenAI usage:
-    # from openai import OpenAI
-    # client = OpenAI()
-    # resp = client.chat.completions.create(
-    #   model=cfg.model,
-    #   temperature=cfg.temperature,
-    #   max_tokens=cfg.max_tokens,
-    #   seed=cfg.seed,
-    #   messages=[{"role":"system","content":system},{"role":"user","content":user}],
-    # )
-    # return resp.choices[0].message.content
-    return '{"note":"Replace call_llm() internals with your provider!"}'
+    from openai import OpenAI
+    
+    # Initialize client using key from .env
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+    resp = client.chat.completions.create(
+        model=cfg.model,
+        temperature=cfg.temperature,
+        max_tokens=cfg.max_tokens,
+        seed=cfg.seed,
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user}
+        ]
+    )
+    return resp.choices[0].message.content
 
 # =========================================================
 # 3) Judge prompts & helpers
@@ -293,6 +299,65 @@ def _force_json(text: str) -> Dict[str, Any]:
                 pass
         raise ValueError(f"LLM did not return valid JSON:\n{text}")
 
+# =========================================================
+# 3.5) Iterative Summary Refinement
+# =========================================================
+
+_REFINE_PROMPT = """
+You are improving a lecture summary based on feedback from a judge.
+
+[Slides]
+{slides}
+
+[Current Summary]
+{summary}
+
+[Judge Feedback]
+{feedback}
+
+TASK:
+Rewrite the summary so that:
+- all factual errors are fixed,
+- coverage of core concepts improves,
+- clarity and organization improve,
+- unnecessary sentences are removed.
+
+IMPORTANT:
+- Keep the summary roughly the same length.
+- Do NOT add hallucinated details not present in the slides.
+
+Return ONLY the improved summary text, nothing else.
+"""
+
+def refine_summary_once(slides, summary, feedback, cfg):
+    """One refinement step: use the judge feedback to rewrite the summary."""
+    slides_str = _slides_to_str(slides, max_chunks=3, max_tokens=1500)
+    user = _REFINE_PROMPT.format(slides=slides_str, summary=summary, feedback=feedback)
+    raw = call_llm("You revise summaries.", user, cfg)
+    return raw.strip()
+
+def iterative_refine_summary(slides, initial_summary, cfg, iters=3):
+    """
+    Implements Figure 1 of the methodology:
+    S0 -> Judge -> S1 -> Judge -> S2 -> Judge -> S3
+    """
+    S = initial_summary
+    for i in range(iters):
+        fb = judge_scores(slides, S, cfg)   # feedback dictionary
+        # convert judge feedback into a readable string for refinement
+        fb_text = json.dumps({
+            "coverage": fb["coverage"],
+            "faithfulness": fb["faithfulness"],
+            "organization": fb["organization"],
+            "clarity": fb["clarity"],
+            "style": fb["style"],
+            "two_strengths": fb["two_strengths"],
+            "two_issues": fb["two_issues"],
+        }, indent=2)
+
+        S = refine_summary_once(slides, S, fb_text, cfg)
+
+    return S
 
 # =========================================================
 # 4) Judges (single-call versions)
@@ -428,6 +493,100 @@ def pairwise_judge_ensemble(slides, A, B, cfg, runs: int = 5) -> Dict[str, Any]:
     final_winner = "A" if wins["A"] >= wins["B"] else "B"
     return {"winner": final_winner, "wins": wins, "reasons_sample": reasons[:2]}
 
+# =========================================================
+# 5.5) Pairwise-Guided Refinement (EXTENSION)
+# =========================================================
+
+def pairwise_guided_refinement(slides, summary_candidates, cfg, rounds=2):
+    """
+    For each round:
+        - compare all summaries pairwise
+        - keep the winning half
+        - refine the winners once
+    """
+    curr = summary_candidates
+
+    for rd in range(rounds):
+        names = list(curr.keys())
+        scores = {n: 0 for n in names}
+
+        # pairwise comparisons
+        for i in range(len(names)):
+            for j in range(i+1, len(names)):
+                A, B = names[i], names[j]
+                res = pairwise_judge_ensemble(slides, curr[A], curr[B], cfg, runs=3)
+                winner = A if res["winner"] == "A" else B
+                scores[winner] += 1
+
+        # Keep top 50%
+        sorted_names = sorted(scores, key=lambda n: scores[n], reverse=True)
+        keep = sorted_names[:max(1, len(sorted_names)//2)]
+
+        # Refine survivors
+        new_set = {}
+        for k in keep:
+            fb = judge_scores(slides, curr[k], cfg)
+            fb_text = json.dumps(fb, indent=2)
+            refined = refine_summary_once(slides, curr[k], fb_text, cfg)
+            new_set[k] = refined
+
+        curr = new_set
+
+    return curr
+
+# =========================================================
+# 5.6) Reference-Agreement-Guided Refinement
+# =========================================================
+
+_REFINE_AGREEMENT_PROMPT = """
+You are improving a lecture summary to better align with a reference (human-written) summary.
+
+[Slides]
+{slides}
+
+[Current Summary]
+{summary}
+
+[Reference Summary]
+{reference}
+
+[Agreement Feedback]
+{feedback}
+
+Improve the summary WITHOUT:
+- copying sentences exactly,
+- introducing hallucinations not grounded in the slides.
+
+Focus on:
+- keeping all factual content aligned with the slides,
+- matching reference-level coverage,
+- improving clarity and structure.
+
+Return ONLY the refined summary text.
+"""
+
+def refine_summary_toward_reference(slides, summary, reference, feedback, cfg):
+    slides_str = _slides_to_str(slides, max_chunks=3, max_tokens=1500)
+    user = _REFINE_AGREEMENT_PROMPT.format(
+        slides=slides_str,
+        summary=summary,
+        reference=reference,
+        feedback=feedback
+    )
+    raw = call_llm("You refine summaries toward reference targets.", user, cfg)
+    return raw.strip()
+
+
+def agreement_calibrated_refinement(slides, initial_summary, reference, cfg, iters=2):
+    """
+    Summary refinement loop supervised partly by human reference.
+    """
+    S = initial_summary
+    for i in range(iters):
+        fb = judge_agreement(slides=slides, reference=reference, summary=S, cfg=cfg)
+        fb_text = json.dumps(fb, indent=2)
+        S = refine_summary_toward_reference(slides, S, reference, fb_text, cfg)
+    return S
 
 # =========================================================
 # 6) Scoring combiner & evaluation entry points
@@ -462,19 +621,20 @@ def evaluate_one_summary(
     human_reference: str,
     cfg: LLMConfig,
     target_words: int = 300,
+    refine_iters: int = 0,
 ) -> Dict[str, Any]:
-    """
-    End-to-end evaluation for a single summary:
-      - deterministic signals
-      - ensemble rubric judge
-      - ensemble reference agreement
-      - final scalar score
-    """
+
+    # Optional: Iterative refinement
+    if refine_iters > 0:
+        model_summary = iterative_refine_summary(slides, model_summary, cfg, iters=refine_iters)
+
     sig = simple_signals(slides, model_summary, target_words=target_words)
     rubric = judge_scores_ensemble(slides, model_summary, cfg, runs=3)
     agree  = judge_agreement_ensemble(human_reference, model_summary, cfg, runs=3)
     score = llm_score(rubric, agree)
+
     return {
+        "refined_summary": model_summary,
         "signals": sig,
         "rubric": rubric,
         "agreement": agree,
@@ -557,3 +717,25 @@ if __name__ == "__main__":
     # print("Eval:", res)
     # rr = round_robin_pairwise(slides, {"A": model_sum, "B": "Another summary..."}, cfg)
     # print("Pairwise:", rr)
+    # =========================================================
+    # OPTIONAL: Full iterative refinement + evaluation demo
+    # =========================================================
+
+    # 1) Use your existing model summary as S0
+    initial = model_sum  # or call your summarization model here
+
+    # 2) Run full pipeline with 3 refinement iterations
+    res = evaluate_one_summary(
+        slides,
+        initial,
+        human_ref,
+        cfg,
+        refine_iters=3   # <-------- THIS ACTIVATES THE ITERATIVE REFINEMENT
+    )
+
+    print("\n=== Final Scalar Score (0–1) ===")
+    print(res["final_score_0to1"])
+
+    print("\n=== Refined Summary ===")
+    print(res["refined_summary"])
+

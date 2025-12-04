@@ -1,0 +1,11 @@
+name: dsc180a-eval
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - numpy
+  - scikit-learn
+  - pip
+  - pip:
+      - openai
+      - python-dotenv
