@@ -35,13 +35,29 @@ DSC180A-Final-Project/
 
 ## 🛠 Environment Setup
 
-### Create environment
+### Start-Up Scripts:
+
+#### If you have Mac/Linux (bash):
+
+```bash
+chmod +x startup.sh
+source startup.sh
+```
+
+#### If you have Windows (PowerShell):
+```powershell
+powershell -ExecutionPolicy Bypass -File startup.ps1
+```
+
+### Running the Start-Up Does the Following (You don't have to do this if you ran the startup script):
+
+#### Create environment
 ```bash
 conda env create -f environment.yml
 conda activate dsc180a-eval
 ```
 
-### Environment variables
+#### Environment variables
 Create `.env`:
 ```
 OPENAI_API_KEY=your_key_here
