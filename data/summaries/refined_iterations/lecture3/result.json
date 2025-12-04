@@ -1,10 +1,10 @@
 {
-  "refined_summary": "This lecture expanded on An\u00edbal\u202fQuijano\u2019s concept of the *coloniality of power* within the broader Modernity/Coloniality/Decoloniality (MCD) framework. The MCD project argues that modernity, coloniality, and decoloniality are interlinked: Western modernity emerged alongside colonial domination; coloniality exposes how power and knowledge were organized through that domination; and decoloniality seeks to recover suppressed epistemologies and ways of being.  \n\nA Peruvian sociologist, Quijano traced how the conquest of the Americas simultaneously produced new racial hierarchies and new systems of labor control, establishing a global model of capitalist dependency. Race, constructed as a \u201cmental category\u201d of modernity, divided humanity into \u201csuperior\u201d and \u201cinferior\u201d groups, legitimizing exploitation through systems like slavery, encomienda, and mita. This racialized order became embedded in global capitalism, determining who could access spaces, privileges, and authority.  \n\nEurocentrism, for Quijano, naturalized this hierarchy by positioning Europe as the universal standard of knowledge, progress, and civilization. Linking his argument to Stuart\u202fHall\u2019s *\u201cWest and the Rest\u201d* discourse, the lecture showed how Eurocentrism relied on binary oppositions\u2014civilized/primitive, developed/underdeveloped, First/Third\u202fWorld\u2014to rationalize conquest and modernization. These ideas shaped economic, political, and cultural theories of democracy and development that continued to privilege whiteness and European norms long after formal colonialism ended.  \n\nThe lecture then traced how these patterns informed Latin American national identities. Drawing on Rebecca\u202fEarle\u2019s study of \u201cIndianesque nationalism,\u201d it illustrated how post\u2011independence elites romanticized a distant Indigenous past to claim local authenticity while excluding living Indigenous peoples. The later ideology of *mestizaje* framed racial mixing as unity but reproduced Eurocentric ideals of whiteness and assimilation\u2014visualized in works such as Modesto\u202fBrocos\u2019s *The\u202fRedemption of\u202fHam*. Film analyses like Alfonso\u202fCuar\u00f3n\u2019s *Roma* further revealed how colonial hierarchies of race, labor, and representation persist within modern social structures.  \n\nIn class, the portfolio exercise guided students to identify and analyze key passages from Quijano\u2019s essay, connecting textual evidence to themes of coloniality of power and Eurocentrism. Through these applications, the lecture emphasized that colonial legacies shape both historical and contemporary imaginations of race, nation, and modernity.  \n\nQuijano\u2019s concluding call for *decoloniality* urged breaking free from the \u201cEurocentric mirror\u201d that distorts self\u2011understanding. Decolonial thinking centers non\u2011Western epistemologies, languages, and cosmologies, proposing a plural vision of modernities capable of dismantling the enduring matrix of power and knowledge forged through colonialism.",
+  "refined_summary": "This lecture expands on An\u00edbal\u202fQuijano\u2019s concept of the **\u201ccoloniality of power\u201d** and its lasting impact on modernity, capitalism, and identity in Latin\u202fAmerica. Quijano, a Peruvian sociologist, developed his thought from **dependency theory** (centered on political economy and development), through studies of **culture and historiography**, to **decolonial theory**, which explores how colonial relations of knowledge and power persist beyond formal colonialism. His ideas form part of the **Modernity/Coloniality/Decoloniality (MCD) project**, which reexamines world history through three interlinked lenses:  \n\n- **Modernity**\u2014rethinking historical narratives that present Western progress as universal, aligning with Stuart\u202fHall\u2019s critique of the \u201cWest and the Rest.\u201d  \n- **Coloniality**\u2014highlighting enduring structures of domination that privilege Western epistemologies and obscure Indigenous and Afro\u2011descendant worldviews.  \n- **Decoloniality**\u2014centering non\u2011Western languages, cosmologies, and ways of being to unsettle Eurocentric hierarchies.  \n\nQuijano argues that the **coloniality of power** emerged through two foundational processes: (1) the construction of racial difference between conquerors and conquered, and (2) the organization of labor through systems such as slavery, encomienda, and mita. These regimes tied **race, labor, and social order** to the rise of global capitalism. Over time, **Eurocentrism** naturalized these inequities\u2014casting Europe as the sole source of reason and progress\u2014and continues to shape ideas of \u201cdevelopment,\u201d \u201cdemocracy,\u201d and \u201csuccess.\u201d  \n\nThe lecture traced how coloniality endures in both structural and cultural forms. The film *Roma* was discussed as an example where class, gender, and Indigeneity reproduce colonial hierarchies despite a contemporary setting. A focus on **heterogeneity and discontinuity** challenged linear European models of history, emphasizing situated, plural modernities that recognize diverse forms of agency and change.  \n\nTurning to **national identity**, historian **Rebecca\u202fEarle\u2019s** analysis of *\u201cIndianesque nationalism\u201d* shows early post\u2011independence elites celebrating a romanticized Indigenous past to mark distance from Spain while excluding living Indigenous peoples. Later **mestizaje** ideologies appeared to unify nations through racial mixing but often reinforced whiteness and erased Afro\u2011descendant and Indigenous experiences\u2014illustrating how Eurocentrism continued to frame nation\u2011building.  \n\nFinally, Quijano\u2019s call for **decoloniality** urges societies to reject the distorted reflection of the Eurocentric \u201cmirror\u201d and recover marginalized perspectives as sources of knowledge and power. The week concluded with media\u2011based questions inviting students to apply these concepts\u2014examining contemporary examples of colonial legacies and considering how Quijano\u2019s framework might inform concrete efforts toward dismantling the global matrix of domination.",
   "signals": {
-    "length_error": 0.24333333333333335,
-    "section_coverage_pct": 0.8571428571428571,
-    "glossary_recall": 0.5280898876404494,
-    "suspected_hallucination_rate": 0.6875
+    "length_error": 0.24666666666666667,
+    "section_coverage_pct": 0.7857142857142857,
+    "glossary_recall": 0.5955056179775281,
+    "suspected_hallucination_rate": 0.5384615384615384
   },
   "rubric": {
     "coverage": 5,
@@ -14,22 +14,24 @@
     "style": 4,
     "overall_1to10": 9,
     "two_strengths": [
-      "Comprehensively covers all major themes, including coloniality of power, Eurocentrism, and national identity.",
-      "Highly faithful to slide language and sequence, accurately conveying Quijano\u2019s arguments and the lecture\u2019s structure."
+      "Comprehensively integrates all major lecture themes including coloniality of power, Eurocentrism, and national identity.",
+      "Demonstrates accurate understanding of how Quijano links race and labor to global capitalism."
     ],
     "two_issues": [
-      "Could have briefly referenced the Modernity/Coloniality/Decoloniality diagram purpose to clarify connections.",
-      "Might note the assigned readings/media more explicitly to complete context."
+      "Style slightly overpolished and interpretive in tone, less neutral than needed for notes.",
+      "Could include a clearer mention of portfolio assignment instructions to reflect class emphasis on application."
     ],
     "faithfulness_evidence": [
-      "Slide 11 states 'Constitution of differences... (West/Rest)' and 'new structure of labor control', both clearly reflected in the summary.",
-      "Slide 19 quotes Quijano\u2019s call to 'free ourselves from the Eurocentric mirror,' accurately paraphrased in the final paragraph."
+      "Slide 11: 'Two historical processes... Constitution of differences (conquerors 'West' and conquered 'Rest')... new structure of labor control'",
+      "Slide 19: 'Consequently, it is time to learn to free ourselves from the Eurocentric mirror... to cease being what we are not.'"
     ]
   },
   "agreement": {
     "agreement_1to5": 5,
     "missing_key_points": [],
-    "added_inaccuracies": []
+    "added_inaccuracies": [
+      "Mentions the film 'Roma' and media-based questions, which were not in the reference lecture."
+    ]
   },
   "final_score_0to1": 0.9833333333333334,
   "lecture_title": "lecture3"

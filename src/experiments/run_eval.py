@@ -3,10 +3,14 @@
 """
 Run a full evaluation for a single lecture.
 
-Usage:
-    python -m src.experiments.run_eval lecture2
-    python -m src.experiments.run_eval lecture3
-If no argument is provided, defaults to lecture1.
+Usage Examples:
+    python -m src.experiments.run_eval lecture1
+    python -m src.experiments.run_eval lecture2 yes   # force regenerate S0
+    python -m src.experiments.run_eval lecture3 no    # reuse existing S0
+
+Defaults:
+    lecture_id = "lecture1"
+    regenerate_s0 = "no"
 """
 
 import os
@@ -17,7 +21,6 @@ from dotenv import load_dotenv
 from src.evaluation.pipeline import evaluate_summary
 from src.models.llm_client import LLMConfig
 from src.models.summarizer import generate_initial_summary
-
 
 # ================================================================
 # Load .env from project root
@@ -33,14 +36,20 @@ load_dotenv(ENV_PATH)
 def main():
 
     # ------------------------------------------------------------
-    # Allow CLI selection of lecture
+    # Parse CLI arguments
     # ------------------------------------------------------------
     if len(sys.argv) > 1:
         lecture_id = sys.argv[1].strip()
-        print(f"\n📘 Using lecture: {lecture_id}")
     else:
         lecture_id = "lecture1"
-        print("\n📘 No lecture specified — defaulting to lecture1")
+
+    if len(sys.argv) > 2:
+        force_regen = sys.argv[2].strip().lower()
+    else:
+        force_regen = "no"   # default
+
+    print(f"\n📘 Lecture selected: {lecture_id}")
+    print(f"🔄 Force regenerate S0: {force_regen}")
 
     # ------------------------------------------------------------
     # Define paths
@@ -60,10 +69,9 @@ def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # ------------------------------------------------------------
-    # Clean old evaluation outputs
+    # Clean evaluation folder
     # ------------------------------------------------------------
-    print(f"🧹 Cleaning old evaluation files in {OUT_DIR} ...")
-
+    print(f"🧹 Clearing previous evaluation runs for {lecture_id}...")
     for file in OUT_DIR.glob("*"):
         try:
             file.unlink()
@@ -77,23 +85,33 @@ def main():
         human_reference = f.read().strip()
 
     # ============================================================
-    # Load or generate initial summary S0
+    # Load / Generate Initial Summary S0
     # ============================================================
+    regenerate = (force_regen == "yes")
     initial_summary = ""
 
-    if INITIAL_SUMMARY_PATH.exists():
+    if INITIAL_SUMMARY_PATH.exists() and not regenerate:
+        # Try loading existing S0
         with open(INITIAL_SUMMARY_PATH, "r") as f:
             initial_summary = f.read().strip()
 
         if len(initial_summary.split()) < 50:
-            print(f"[S0] Existing S0 summary too short — regenerating.")
+            print("[S0] Existing S0 too short — regenerating...")
             initial_summary = ""
-
         else:
-            print(f"[S0] Loaded existing S0 from {INITIAL_SUMMARY_PATH}")
+            print(f"[S0] Reusing existing S0 at {INITIAL_SUMMARY_PATH}")
 
+    else:
+        if regenerate:
+            print("[S0] Force regenerate is ON — creating new S0.")
+        else:
+            print("[S0] No S0 found — generating new S0.")
+
+        initial_summary = ""
+
+    # Generate new S0 if needed
     if not initial_summary:
-        print(f"[S0] Generating S0 using gpt-5-chat-latest...")
+        print("[S0] Generating new S0 with gpt-5-chat-latest...")
 
         cfg_summarizer = LLMConfig(
             model="gpt-5-chat-latest",
@@ -106,7 +124,7 @@ def main():
         with open(INITIAL_SUMMARY_PATH, "w") as f:
             f.write(initial_summary)
 
-        print(f"[S0] Saved new S0 to {INITIAL_SUMMARY_PATH}")
+        print(f"[S0] Saved new S0 → {INITIAL_SUMMARY_PATH}")
 
     # ============================================================
     # Judge & Refiner Models
@@ -122,7 +140,7 @@ def main():
     )
 
     # ============================================================
-    # Run Evaluation
+    # Run Evaluation Pipeline
     # ============================================================
     result = evaluate_summary(
         slide_path=SLIDES_PATH,
@@ -136,7 +154,7 @@ def main():
     )
 
     # ============================================================
-    # Print + Save Results
+    # Print Results
     # ============================================================
     print("\n===== FINAL EVALUATION RESULT =====")
     print("Score (0–1):", result["final_score_0to1"])

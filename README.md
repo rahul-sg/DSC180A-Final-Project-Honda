@@ -50,8 +50,12 @@ OPENAI_API_KEY=your_key_here
 ## ▶️ Running Evaluation
 Evaluate a lecture:
 ```bash
-python src/experiments/run_eval.py lecture1
+python src/experiments/run_eval.py lecture1 yes
 ```
+
+Parameters:
+- 0: `lecture[Number]` - replace number with which lecture you want to test
+- 1: `yes` - takes `yes` or `no` by default if omitted and forces regeneration of S0
 
 This generates:
 ```
