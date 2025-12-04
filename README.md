@@ -50,7 +50,7 @@ OPENAI_API_KEY=your_key_here
 ## ▶️ Running Evaluation
 Evaluate a lecture:
 ```bash
-python src/experiments/run_eval.py lecture1 yes
+python -m src.experiments.run_eval lecture1 yes
 ```
 
 Parameters:

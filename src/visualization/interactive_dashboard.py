@@ -75,6 +75,8 @@ if not lectures:
 
 lecture_id = st.sidebar.selectbox("Select Lecture:", lectures)
 
+st.subheader(f"Lecture: {lecture_id[-1:]}")
+
 iter_dir = root_dir / lecture_id
 result_json = iter_dir / "result.json"
 
