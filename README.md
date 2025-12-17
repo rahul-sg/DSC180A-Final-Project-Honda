@@ -27,11 +27,21 @@ DSC180A-Final-Project/
 │   ├── utils/
 │   └── visualization/
 │
+├── papers/
+│   ├── Q1/
+│       └── HondaResearchLabs_Eval_Systems_Of_LLMs_Q1.pdf
+│   ├── Q2/
+│       └── Q2_Written_Proposal.pdf
+│
 ├── environment.yml
 ├── requirements.txt
 ├── eval_baseline.py
 └── README.md
 ```
+
+## 📄 Paper
+
+#### Our Quarter 1 Report/Paper and Quarter 2 Project Proposal are listed under the ```papers/Q1/``` and ```papers/Q2/``` folders.
 
 ## 🛠 Environment Setup
 
